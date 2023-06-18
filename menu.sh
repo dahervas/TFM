@@ -1,8 +1,5 @@
 #!/bin/sh
  
-# Codigo que muestra como gestionar un menu desde consola.
-# http://www.lawebdelprogramador.com
- 
 # Muestra el menu general
 _menu()
 {
@@ -91,3 +88,12 @@ do
     esac
     read opc
 done
+
+
+
+
+####################################################################
+
+#REFERENCIAS:
+
+# Codigo que muestra como gestionar un menu desde consola: http://www.lawebdelprogramador.com
