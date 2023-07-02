@@ -9,8 +9,8 @@ _menu()
     echo
     echo "Selecciona una opcion:"
     echo
-    echo "1) Opcion Asignar Dominio"
-    echo "2) Opcion 2"
+    echo "1) Opcion 1: Asignar Dominio"
+    echo "2) Opcion 2: Ejecución Metagoofil"
     echo "3) Opcion 3"
     echo "4) Opcion 4"
     echo "5) Opcion 5"
@@ -28,13 +28,24 @@ _mostrarResultado()
     echo "------------------------------------"
     echo "Has seleccionado la opcion $1"
     echo "------------------------------------"
-    echo ""
+    #echo ""
 
     if [ "$1" -eq "1" ]; then
         #echo "Introduce el dominio: "
         read -p "Introduce el dominio: " dom
-        echo
+        echo ""
     fi
+
+    if [ "$1" -eq "2" ]; then
+      if [ -z "$dom" ]; then
+        echo "El dominio no puede estar vacío!"
+      else
+        echo "Ejecución de Metagoofil"
+        echo "------------------------------------"
+        echo ""
+        _metaGoofil $dom
+      fi
+    fi 
 
 }
 
@@ -46,6 +57,22 @@ _mostrarError()
   echo "Has seleccionado una opción incorrecta"
   echo "------------------------------------"
   echo ""
+}
+
+_metaGoofil(){
+  domain=$1
+
+  if [ -f /home/david/TFM/temp/metaGoofLog.txt ]; then
+    rm /home/david/TFM/temp/metaGoofLog.txt
+  fi
+
+  metagoofil -d $domain -t pdf -o /home/david/TFM/temp -f ficpdf.html >> /home/david/TFM/temp/metaGoofLog.txt
+
+  if [ $? -ne 0 ]; then
+    echo "Error en la ejecución de Metagoofil"
+  else
+    echo "Ficheros .pdf del dominio $domain recuperados en /home/david/TFM/temp"
+  fi
 }
  
 # opcion por defecto
