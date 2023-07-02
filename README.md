@@ -21,3 +21,22 @@ METAS PRÓXIMAS:
 -Limpiar el código del menú.
 
 =============================================
+# VERSION 0.2
+
+METAS ALCANZADAS:
+
+-La segunda opción es funcional (Ejecución Metagoofil).
+
+-Con el parámetro (dominio) de la primera opción, se puede ejecutar la segunda para llevar a cabo una fase del reconocimiento.
+
+=============================================
+
+METAS PRÓXIMAS:
+
+-Desarrollar las funcionalidades siguientes (reconocimiento, descubrimiento y explotación).
+
+-Embellecer el menú.
+
+-Limpiar el código del menú.
+
+=============================================
