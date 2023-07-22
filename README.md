@@ -2,7 +2,7 @@
 Master's degree final project
 
 =============================================
-# VERSION 0.1
+# VERSION 0.0.1
 
 METAS ALCANZADAS:
 
@@ -21,7 +21,7 @@ METAS PRÓXIMAS:
 -Limpiar el código del menú.
 
 =============================================
-# VERSION 0.2
+# VERSION 0.0.2
 
 METAS ALCANZADAS:
 
@@ -40,7 +40,7 @@ METAS PRÓXIMAS:
 -Limpiar el código del menú.
 
 =============================================
-# VERSION 0.3
+# VERSION 0.0.3
 
 METAS ALCANZADAS:
 
