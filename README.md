@@ -60,7 +60,7 @@ METAS PRÓXIMAS:
 
 -Dar más capacidad de personalización para la ejecución de theHarvester, permitiendo al usuario introducir manualmente (si quiere) introducir los valores del parámetro -b (fuentes)
 
--Para permitir que el script sea ejecutable desde un entorno diferente, se pueden variabilizar las rutas donde se guardan los ficheros deejecuciones y logs.
+-Para permitir que el script sea ejecutable desde un entorno diferente, se pueden variabilizar las rutas donde se guardan los ficheros de ejecuciones y logs.
 
 -Se está investigando la manera de añadir una barra de progreso para evitar que el usuario espere a la ejecución de las herramientas con una ventana inmóvil.
 
