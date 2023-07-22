@@ -11,7 +11,7 @@ _menu()
     echo
     echo "1) Opcion 1: Asignar Dominio"
     echo "2) Opcion 2: Ejecución Metagoofil"
-    echo "3) Opcion 3"
+    echo "3) Opcion 3: Ejecución theHarvester"
     echo "4) Opcion 4"
     echo "5) Opcion 5"
     echo
@@ -31,7 +31,6 @@ _mostrarResultado()
     #echo ""
 
     if [ "$1" -eq "1" ]; then
-        #echo "Introduce el dominio: "
         read -p "Introduce el dominio: " dom
         echo ""
     fi
@@ -44,6 +43,17 @@ _mostrarResultado()
         echo "------------------------------------"
         echo ""
         _metaGoofil $dom
+      fi
+    fi 
+
+    if [ "$1" -eq "3" ]; then
+      if [ -z "$dom" ]; then
+        echo "El dominio no puede estar vacío!"
+      else
+        echo "Ejecución de theHarvester"
+        echo "------------------------------------"
+        echo ""
+        _theHarvester $dom
       fi
     fi 
 
@@ -66,7 +76,7 @@ _metaGoofil(){
     rm /home/david/TFM/temp/metaGoofLog.txt
   fi
 
-  metagoofil -d $domain -t pdf -o /home/david/TFM/temp -f ficpdf.html >> /home/david/TFM/temp/metaGoofLog.txt
+  metagoofil -d $domain -t pdf -o /home/david/TFM/temp -f /home/david/TFM/temp/ficpdf.html >> /home/david/TFM/temp/metaGoofLog.txt
 
   if [ $? -ne 0 ]; then
     echo "Error en la ejecución de Metagoofil"
@@ -74,6 +84,24 @@ _metaGoofil(){
     echo "Ficheros .pdf del dominio $domain recuperados en /home/david/TFM/temp"
   fi
 }
+
+_theHarvester(){
+  domain=$1
+
+  if [ -f /home/david/TFM/temp/theHarvestLog.txt ]; then
+    rm /home/david/TFM/temp/theHarvestLog.txt
+  fi
+
+  theHarvester -d $domain -b all -f /home/david/TFM/temp/theHarvest.xml >> /home/david/TFM/temp/theHarvestLog.txt
+
+  if [ $? -ne 0 ]; then
+    echo "Error en la ejecución de theHarvester"
+  else
+    echo "Resultados de la ejecución de theHarvester sobre $domain recuperados en /home/david/TFM/temp"
+  fi
+}
+
+
  
 # opcion por defecto
 opc="0"
@@ -115,8 +143,6 @@ do
     esac
     read opc
 done
-
-
 
 
 ####################################################################
