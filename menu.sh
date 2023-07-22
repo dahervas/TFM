@@ -1,8 +1,30 @@
 #!/bin/sh
  
+
+# Muestra el banner del programa 
+_banner()
+{
+
+  echo "         ********************************************************************"
+  echo "         *                  _          ____          _________       _      *"
+  echo "         *       /\        | |_       |     \       |___   ___|     | |_    *"
+  echo "         *      /  \  _   _|  _| ___  |  H  |___  _ __  | | ___  ___|  _|   *"
+  echo "         *     / /\ \| | | | |  /   \ |   _// _ \| '_ \ | |/ _ \/ __| |     *"
+  echo "         *    / /  \ \ (_| | |_|  D  ||  | |  __/| | | || |  __/\__ \ |_    *"
+  echo "         *    \/    \/\____|__| \___/ |__|  \___||_| |_||_|\___||___/___|   *"
+  echo "         *                                                                  *"
+  echo "         *                                                                  *"
+  echo "         *  AutoPenTest  Versión 0.0.3                                      *"
+  echo "         *  Codificado por D. Hervás Rodríguez                              *"
+  echo "         *  dhervas18@alumnos.uned.es                                       *"
+  echo "         *                                                                  *"
+  echo "         ********************************************************************"
+}
+
 # Muestra el menu general
 _menu()
 {
+    _banner
     echo "##########"
     echo "DOMINIO: $dom"
     echo "##########"
@@ -23,7 +45,8 @@ _menu()
 # Muestra la opcion seleccionada del menu
 _mostrarResultado()
 {
-    clear
+
+    #clear
     echo ""
     echo "------------------------------------"
     echo "Has seleccionado la opcion $1"
@@ -61,7 +84,6 @@ _mostrarResultado()
 
 _mostrarError()
 {
-
   echo ""
   echo "------------------------------------"
   echo "Has seleccionado una opción incorrecta"
