@@ -62,4 +62,8 @@ METAS PRÓXIMAS:
 
 -Para permitir que el script sea ejecutable desde un entorno diferente, se pueden variabilizar las rutas donde se guardan los ficheros deejecuciones y logs.
 
+-Se está investigando la manera de añadir una barra de progreso para evitar que el usuario espere a la ejecución de las herramientas con una ventana inmóvil.
+
+-Se está investigando la manera de evitar que google bloquee las búsquedas al detectar un gran número de peticiones (metagoofil) mediante proxys dinamicos o SSH.
+
 =============================================
