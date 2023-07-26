@@ -36,6 +36,7 @@ _menu()
     echo "3) Opcion 3: Ejecución theHarvester"
     echo "4) Opcion 4"
     echo "5) Opcion 5"
+    echo "99) Opcion 99: Debug"
     echo
     echo "9) Salir"
     echo
@@ -65,7 +66,7 @@ _mostrarResultado()
         echo "Ejecución de Metagoofil"
         echo "------------------------------------"
         echo ""
-        _metaGoofil $dom
+        _metaGoofil $dom & bash spinner.sh $!
       fi
     fi 
 
@@ -76,8 +77,12 @@ _mostrarResultado()
         echo "Ejecución de theHarvester"
         echo "------------------------------------"
         echo ""
-        _theHarvester $dom
+        _theHarvester $dom & bash spinner.sh $!
       fi
+    fi 
+
+    if [ "$1" -eq "99" ]; then
+      sleep 3 & bash spinner.sh $!
     fi 
 
 }
@@ -151,6 +156,10 @@ do
             _menu
             ;;
         5)
+            _mostrarResultado $opc
+            _menu
+            ;;
+        99)
             _mostrarResultado $opc
             _menu
             ;;
