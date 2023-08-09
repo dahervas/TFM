@@ -3,8 +3,8 @@
 PID=$1
 echo "Proceso: $PID"
 i=0
-#sp="/-\|"
-sp="┤┘┴└├┌┬┐"
+sp="/-\|"
+#sp="┤┘┴└├┌┬┐"
 
 echo -n ' '
 while [ -d /proc/$PID ]

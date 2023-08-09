@@ -34,7 +34,7 @@ _menu()
     echo "1) Opcion 1: Asignar Dominio"
     echo "2) Opcion 2: Ejecución Metagoofil"
     echo "3) Opcion 3: Ejecución theHarvester"
-    echo "4) Opcion 4"
+    echo "4) Opcion 4: Ejecución nmap"
     echo "5) Opcion 5"
     echo "99) Opcion 99: Debug"
     echo
@@ -79,10 +79,29 @@ _mostrarResultado()
         echo ""
         _theHarvester $dom & bash spinner.sh $!
       fi
-    fi 
+    fi
+
+    if [ "$1" -eq "4" ]; then
+      if [ -z "$dom" ]; then
+        echo "El dominio no puede estar vacío!"
+      else
+        echo "Ejecución de nmap"
+        echo "------------------------------------"
+        echo ""
+        _nmap $dom & bash spinner.sh $!
+      fi
+    fi  
 
     if [ "$1" -eq "99" ]; then
-      sleep 3 & bash spinner.sh $!
+      #sleep 3 & bash spinner.sh $!
+      service postgresql start || exit
+
+      msfconsole <<EOF
+      sleep 5
+      ?
+      quit
+EOF
+
     fi 
 
 }
@@ -103,7 +122,7 @@ _metaGoofil(){
     rm /home/david/TFM/temp/metaGoofLog.txt
   fi
 
-  metagoofil -d $domain -t pdf -o /home/david/TFM/temp -f /home/david/TFM/temp/ficpdf.html >> /home/david/TFM/temp/metaGoofLog.txt
+  metagoofil -d $domain -t pdf -o /home/david/TFM/temp -f /home/david/TFM/temp/ficpdf.html > /home/david/TFM/temp/metaGoofLog.txt
 
   if [ $? -ne 0 ]; then
     echo "Error en la ejecución de Metagoofil"
@@ -119,7 +138,7 @@ _theHarvester(){
     rm /home/david/TFM/temp/theHarvestLog.txt
   fi
 
-  theHarvester -d $domain -b all -f /home/david/TFM/temp/theHarvest.xml >> /home/david/TFM/temp/theHarvestLog.txt
+  theHarvester -d $domain -b all -f /home/david/TFM/temp/theHarvest.xml > /home/david/TFM/temp/theHarvestLog.txt
 
   if [ $? -ne 0 ]; then
     echo "Error en la ejecución de theHarvester"
@@ -128,6 +147,20 @@ _theHarvester(){
   fi
 }
 
+_nmap(){
+  domain=$1
+  
+  if [ -f /home/david/TFM/temp/nmap_output.txt ]; then
+    rm /home/david/TFM/temp/nmap_output.txt
+  fi
+  nmap -p- -oG /home/david/TFM/temp/nmap_output.txt $domain > /home/david/TFM/temp/nmapLog.txt
+
+  if [ $? -ne 0 ]; then
+    echo "Error en la ejecución de nmap"
+  else
+    echo "Resultados de la ejecución de nmap sobre $domain recuperados en /home/david/TFM/temp"
+  fi
+}
 
  
 # opcion por defecto
