@@ -124,12 +124,7 @@ _mostrarResultado()
       #SELECT * FROM TEST2;
       #sqlite3 /home/david/TFM/BDD.db 'INSERT INTO TEST2(CLAVE1, CLAVE2) VALUES ('$var',"TEST INSERCIÓN");' 2>/dev/null
 #END_SQL
-      sqlite3 /home/david/TFM/BDD.db 'DELETE FROM T_METAGOOF;'
-      while read p; do
-        line=$(echo "'""$p""'")
-        #echo $line
-        sqlite3 /home/david/TFM/BDD.db 'INSERT INTO T_METAGOOF(DOCUMENTO) VALUES ('$line');'
-      done </home/david/TFM/temp/metaGoof.html
+
 
     fi 
 
@@ -180,6 +175,68 @@ _theHarvester(){
     echo "Error en la ejecución de theHarvester"
   else
     echo "Resultados de la ejecución de theHarvester sobre $domain recuperados en /home/david/TFM/temp"
+
+    xmllint --format /home/david/TFM/temp/theHarvest.xml > /home/david/TFM/temp/theHarvest.txt
+    cat /home/david/TFM/temp/theHarvest.txt| tr -d "[:blank:]" > /home/david/TFM/temp/theHarvest2.txt && mv /home/david/TFM/temp/theHarvest2.txt /home/david/TFM/temp/theHarvest.txt
+    sed '/^<\//d' /home/david/TFM/temp/theHarvest.txt > /home/david/TFM/temp/theHarvest2.txt && mv /home/david/TFM/temp/theHarvest2.txt /home/david/TFM/temp/theHarvest.txt
+    sed -n -e '/^<host>/p' /home/david/TFM/temp/theHarvest.txt > /home/david/TFM/temp/hosts.txt
+
+    if [ -s /home/david/TFM/temp/hosts.txt ]; then
+      echo "hosts.txt no está vacío"
+      sed -e 's!<host>!!' /home/david/TFM/temp/hosts.txt > /home/david/TFM/temp/hosts2.txt && mv /home/david/TFM/temp/hosts2.txt /home/david/TFM/temp/hosts.txt
+      sed -e 's!</host>!!' /home/david/TFM/temp/hosts.txt > /home/david/TFM/temp/hosts2.txt && mv /home/david/TFM/temp/hosts2.txt /home/david/TFM/temp/hosts.txt
+      sed -i '/^$/d' /home/david/TFM/temp/hosts.txt
+      sqlite3 /home/david/TFM/BDD.db 'DELETE FROM T_THEHARVEST;'
+      while read p; do
+        line=$(echo "'""$p""'")
+        sqlite3 /home/david/TFM/BDD.db 'INSERT INTO T_THEHARVEST(TIPO,DOCUMENTO) VALUES ("HOST",'$line');'
+      done </home/david/TFM/temp/hosts.txt
+    fi
+
+
+    sed -n -e '/^<hostname>/p' /home/david/TFM/temp/theHarvest.txt > /home/david/TFM/temp/hostname.txt
+    
+    if [ -s /home/david/TFM/temp/hostname.txt ]; then
+      echo "hostname.txt no está vacío"
+      sed -e 's!<hostname>!!' /home/david/TFM/temp/hostname.txt > /home/david/TFM/temp/hostname2.txt && mv /home/david/TFM/temp/hostname2.txt /home/david/TFM/temp/hostname.txt
+      sed -e 's!</hostname>!!' /home/david/TFM/temp/hostname.txt > /home/david/TFM/temp/hostname2.txt && mv /home/david/TFM/temp/hostname2.txt /home/david/TFM/temp/hostname.txt
+      sed -i '/^$/d' /home/david/TFM/temp/hostname.txt
+      
+      while read p; do
+        line=$(echo "'""$p""'")
+        sqlite3 /home/david/TFM/BDD.db 'INSERT INTO T_THEHARVEST(TIPO,DOCUMENTO) VALUES ("HOSTNAME",'$line');'
+      done </home/david/TFM/temp/hostname.txt
+    fi
+
+
+    sed -n -e '/^<email>/p' /home/david/TFM/temp/theHarvest.txt > /home/david/TFM/temp/email.txt
+
+    if [ -s /home/david/TFM/temp/email.txt ]; then
+      echo "email.txt no está vacío"
+      sed -e 's!<email>!!' /home/david/TFM/temp/email.txt > /home/david/TFM/temp/email2.txt && mv /home/david/TFM/temp/email2.txt /home/david/TFM/temp/email.txt
+      sed -e 's!</email>!!' /home/david/TFM/temp/email.txt > /home/david/TFM/temp/email2.txt && mv /home/david/TFM/temp/email2.txt /home/david/TFM/temp/email.txt
+      sed -i '/^$/d' /home/david/TFM/temp/email.txt
+      
+      while read p; do
+        line=$(echo "'""$p""'")
+        sqlite3 /home/david/TFM/BDD.db 'INSERT INTO T_THEHARVEST(TIPO,DOCUMENTO) VALUES ("EMAIL",'$line');'
+      done </home/david/TFM/temp/email.txt
+    fi
+
+
+    sed -n -e '/^<ip>/p' /home/david/TFM/temp/theHarvest.txt > /home/david/TFM/temp/ip.txt
+
+    if [ -s /home/david/TFM/temp/ip.txt ]; then
+      echo "ip.txt no está vacío"
+      sed -e 's!<ip>!!' /home/david/TFM/temp/ip.txt > /home/david/TFM/temp/ip2.txt && mv /home/david/TFM/temp/ip2.txt /home/david/TFM/temp/ip.txt
+      sed -e 's!</ip>!!' /home/david/TFM/temp/ip.txt > /home/david/TFM/temp/ip2.txt && mv /home/david/TFM/temp/ip2.txt /home/david/TFM/temp/ip.txt
+      sed -i '/^$/d' /home/david/TFM/temp/ip.txt
+      
+      while read p; do
+        line=$(echo "'""$p""'")
+        sqlite3 /home/david/TFM/BDD.db 'INSERT INTO T_THEHARVEST(TIPO,DOCUMENTO) VALUES ("IP",'$line');'
+      done </home/david/TFM/temp/ip.txt
+    fi
   fi
 }
 
@@ -201,6 +258,7 @@ _nmap(){
 _initBDD()
 {
  sqlite3 /home/david/TFM/BDD.db 'CREATE TABLE IF NOT EXISTS T_METAGOOF(DOCUMENTO TEXT);' 2>/dev/null
+ sqlite3 /home/david/TFM/BDD.db 'CREATE TABLE IF NOT EXISTS T_THEHARVEST(TIPO TEXT,DOCUMENTO TEXT);' 2>/dev/null
 }
  
 # opcion por defecto
