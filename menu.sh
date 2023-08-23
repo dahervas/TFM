@@ -1,5 +1,5 @@
 #!/bin/sh
- 
+
 
 # Muestra el banner del programa 
 _banner()
@@ -100,6 +100,52 @@ _mostrarResultado()
     fi   
 
     if [ "$1" -eq "99" ]; then
+     #setopt shwordsplit
+
+
+      sqlite3 /home/david/TFM/BDD.db 'DELETE FROM T_NMAP;'
+      while read line; do
+        flag=0
+        aux=$(echo $line | cut -c1-1)
+        if [ "$aux" -gt 0 ]; then
+
+          puerto="$(echo $line | cut -d'/' -f1)"
+
+          line=$(echo $line | cut -d'/' -f2 | sed 's/  */ /g')
+
+          flag=1
+
+          puertoBD=$(echo "'""$puerto""'")
+          for part in $line; do
+            partBD=$(echo "'""$part""'")
+            sqlite3 /home/david/TFM/BDD.db <<END_SQL
+            INSERT INTO T_NMAP(PUERTO,INFO) VALUES ('$puerto','$part');
+END_SQL
+
+          done
+        fi 2>/dev/null
+
+        if [ $flag -eq 0 ]; then
+          linea=$(echo $line | sed 's/^..//')
+          
+          sqlite3 /home/david/TFM/BDD.db <<END_SQL
+            INSERT INTO T_NMAP(PUERTO,INFO) VALUES ('$puerto','$linea');
+END_SQL
+        fi  2>/dev/null
+
+      done </home/david/TFM/temp/nmapLog.txt 
+      sqlite3 /home/david/TFM/BDD.db 'SELECT * FROM T_NMAP';
+    #xmllint --format /home/david/TFM/temp/nmap_output.xml > /home/david/TFM/temp/nmap_output.txt
+    #sqlite3 /home/david/TFM/BDD.db 'INSERT INTO T_NMAP(PUERTO,INFO) VALUES ("IP",'$line');'
+    #cat /home/david/TFM/temp/nmap_output.txt| tr -d "[:blank:]" > /home/david/TFM/temp/nmap_output2.txt && mv /home/david/TFM/temp/nmap_output2.txt /home/david/TFM/temp/nmap_output.txt
+    #sed -n -e '/^<port/p' /home/david/TFM/temp/nmap_output.txt > /home/david/TFM/temp/port.txt
+    #nmap -sV --script=vulscan/vulscan.nse --script-args vulscandb=cve.csv www.example.com > /home/david/TFM/temp/nmapLog.txt
+    #sed "$(( $(wc -l </home/david/TFM/temp/nmapLog.txt)-2 )),$ d" /home/david/TFM/temp/nmapLog.txt > /home/david/TFM/temp/nmapMod.txt 
+    #sed -e '1,6d' /home/david/TFM/temp/nmapMod.txt > /home/david/TFM/temp/nmapLog.txt
+    #sed '/^|_/d' /home/david/TFM/temp/nmapLog.txt > /home/david/TFM/temp/nmapMod.txt
+    #sed '/^| vulscan/d' /home/david/TFM/temp/nmapMod.txt > /home/david/TFM/temp/nmapLog.txt
+    #sed -r '/^.{,3}$/d' /home/david/TFM/temp/nmapLog.txt > /home/david/TFM/temp/nmapMod.txt
+    #sed '/closed/d' /home/david/TFM/temp/nmapMod.txt > /home/david/TFM/temp/nmapLog.txt
       #sleep 3 & bash spinner.sh $!
       #sudo service postgresql start || exit
 
@@ -115,7 +161,7 @@ _mostrarResultado()
       #read port
 
       #msfconsole -q -x " use exploit/multi/handler; set payload android/meterpreter/reverse_tcp; set lhost $ip; set lport $port ; exploit;"
-      var=999
+      #var=999
       #sqlite3 /home/david/TFM/BDD.db <<'END_SQL'
       #INSERT INTO TEST(CLAVE1, CLAVE2) VALUES ('$var',"TEST INSERCIÓN");
       #CREATE TABLE IF NOT EXISTS TEST2 AS SELECT * FROM TEST;
@@ -124,7 +170,19 @@ _mostrarResultado()
       #SELECT * FROM TEST2;
       #sqlite3 /home/david/TFM/BDD.db 'INSERT INTO TEST2(CLAVE1, CLAVE2) VALUES ('$var',"TEST INSERCIÓN");' 2>/dev/null
 #END_SQL
+    #sed -n -e '/^<email>/p' /home/david/TFM/temp/theHarvest.txt > /home/david/TFM/temp/email.txt
 
+    #if [ -s /home/david/TFM/temp/email.txt ]; then
+      #echo "email.txt no está vacío"
+      #sed -e 's!<email>!!' /home/david/TFM/temp/email.txt > /home/david/TFM/temp/email2.txt && mv /home/david/TFM/temp/email2.txt /home/david/TFM/temp/email.txt
+      #sed -e 's!</email>!!' /home/david/TFM/temp/email.txt > /home/david/TFM/temp/email2.txt && mv /home/david/TFM/temp/email2.txt /home/david/TFM/temp/email.txt
+      #sed -i '/^$/d' /home/david/TFM/temp/email.txt
+      
+      #while read p; do
+        #line=$(echo "'""$p""'")
+        #sqlite3 /home/david/TFM/BDD.db 'INSERT INTO T_THEHARVEST(TIPO,DOCUMENTO) VALUES ("EMAIL",'$line');'
+      #done </home/david/TFM/temp/email.txt
+    #fi
 
     fi 
 
@@ -246,11 +304,57 @@ _nmap(){
   if [ -f /home/david/TFM/temp/nmap_output.txt ]; then
     rm /home/david/TFM/temp/nmap_output.txt
   fi
-  nmap -p- -O -oG /home/david/TFM/temp/nmap_output.txt $domain > /home/david/TFM/temp/nmapLog.txt
+
+  nmap -sV --script=vulscan/vulscan.nse --script-args vulscandb=cve.csv $domain > /home/david/TFM/temp/nmapLog.txt
 
   if [ $? -ne 0 ]; then
     echo "Error en la ejecución de nmap"
   else
+
+
+    sed "$(( $(wc -l </home/david/TFM/temp/nmapLog.txt)-3 )),$ d" /home/david/TFM/temp/nmapLog.txt > /home/david/TFM/temp/nmapMod.txt 
+    sed -e '1,6d' /home/david/TFM/temp/nmapMod.txt > /home/david/TFM/temp/nmapLog.txt
+    sed '/^|_/d' /home/david/TFM/temp/nmapLog.txt > /home/david/TFM/temp/nmapMod.txt
+    sed '/^| vulscan/d' /home/david/TFM/temp/nmapMod.txt > /home/david/TFM/temp/nmapLog.txt
+    sed -r '/^.{,3}$/d' /home/david/TFM/temp/nmapLog.txt > /home/david/TFM/temp/nmapMod.txt
+    sed '/closed/d' /home/david/TFM/temp/nmapMod.txt > /home/david/TFM/temp/nmapLog.txt
+
+
+    sqlite3 /home/david/TFM/BDD.db 'DELETE FROM T_NMAP;'
+    while read line; do
+      flag=0
+      aux=$(echo $line | cut -c1-1)
+      if [ "$aux" -gt 0 ]; then
+
+        puerto="$(echo $line | cut -d'/' -f1)"
+
+        line=$(echo $line | cut -d'/' -f2 | sed 's/  */ /g')
+
+        flag=1
+
+        puertoBD=$(echo "'""$puerto""'")
+        for part in $line; do
+          partBD=$(echo "'""$part""'")
+          sqlite3 /home/david/TFM/BDD.db <<END_SQL
+          INSERT INTO T_NMAP(PUERTO,INFO) VALUES ('$puerto','$part');
+END_SQL
+
+        done
+      fi 2>/dev/null
+
+      if [ $flag -eq 0 ]; then
+        linea=$(echo $line | sed 's/^..//')
+        
+        sqlite3 /home/david/TFM/BDD.db <<END_SQL
+          INSERT INTO T_NMAP(PUERTO,INFO) VALUES ('$puerto','$linea');
+END_SQL
+      fi  2>/dev/null
+
+    done </home/david/TFM/temp/nmapLog.txt
+
+    #xmllint --format /home/david/TFM/temp/nmap_output.xml > /home/david/TFM/temp/nmap_output.txt
+    #cat /home/david/TFM/temp/nmap_output.txt| tr -d "[:blank:]" > /home/david/TFM/temp/nmap_output2.txt && mv /home/david/TFM/temp/nmap_output2.txt /home/david/TFM/temp/nmap_output.txt
+    #sed -n -e '/^<port>/p' /home/david/TFM/temp/nmap_output.txt > /home/david/TFM/temp/port.txt
     echo "Resultados de la ejecución de nmap sobre $domain recuperados en /home/david/TFM/temp"
   fi
 }
@@ -259,6 +363,8 @@ _initBDD()
 {
  sqlite3 /home/david/TFM/BDD.db 'CREATE TABLE IF NOT EXISTS T_METAGOOF(DOCUMENTO TEXT);' 2>/dev/null
  sqlite3 /home/david/TFM/BDD.db 'CREATE TABLE IF NOT EXISTS T_THEHARVEST(TIPO TEXT,DOCUMENTO TEXT);' 2>/dev/null
+
+ sqlite3 /home/david/TFM/BDD.db 'CREATE TABLE IF NOT EXISTS T_NMAP(PUERTO INT,INFO TEXT);' 2>/dev/null
 }
  
 # opcion por defecto
