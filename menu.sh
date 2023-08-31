@@ -487,7 +487,7 @@ printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
 
 _repMetagoofil(){
   echo "\n\n# Etapa 1: Reconocimiento - metagoofil" >> /home/david/TFM/Reporte/Reporte.md
-  sqlite3 /home/david/TFM/BDD.db "SELECT * FROM T_METAGOOF;" > /home/david/TFM/Reporte/metagoofil.txt
+  sqlite3 /home/david/TFM/BDD.db "SELECT * FROM T_METAGOOF LIMIT 32;" > /home/david/TFM/Reporte/metagoofil.txt
   
   printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
@@ -510,7 +510,7 @@ _repMetagoofil(){
     if [ "$aux" -eq "17" ]; then
       printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+      #printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
       aux=0
     fi
@@ -518,24 +518,24 @@ _repMetagoofil(){
 
   printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+  #printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
 }
 
 _repHarvester(){
 
   echo "\n\n# Etapa 1: Reconocimiento - theHarvester" >> /home/david/TFM/Reporte/Reporte.md
-  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOST' LIMIT 50;" > /home/david/TFM/Reporte/theHarvHost.txt
+  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOST' LIMIT 38;" > /home/david/TFM/Reporte/theHarvHost.txt
   #sed -e 's!HOST|!!' /home/david/TFM/Reporte/theHarvHost.txt > /home/david/TFM/Reporte/theHarvHost2.txt && 
-  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOSTNAME' LIMIT 50;" > /home/david/TFM/Reporte/theHarvHostname.txt
-  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='IP' LIMIT 50;" > /home/david/TFM/Reporte/theHarvIp.txt
-  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='EMAIL' LIMIT 50;" > /home/david/TFM/Reporte/theHarvEmail.txt
+  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOSTNAME' LIMIT 38;" > /home/david/TFM/Reporte/theHarvHostname.txt
+  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='IP' LIMIT 38;" > /home/david/TFM/Reporte/theHarvIp.txt
+  sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='EMAIL' LIMIT 38;" > /home/david/TFM/Reporte/theHarvEmail.txt
 
 
   ##########HOST############
   printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\hline  \textbf{Hosts} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
   aux=1
@@ -545,7 +545,7 @@ _repHarvester(){
     if [ "$aux" -eq "0" ]; then
       printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\hline  \textbf{Hosts} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
     fi
 
@@ -571,7 +571,7 @@ _repHarvester(){
   ##########HOSTNAMES############
   printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\hline  \textbf{Hostnames} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
   aux=1
@@ -581,7 +581,7 @@ _repHarvester(){
     if [ "$aux" -eq "0" ]; then
       printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\hline  \textbf{Hostnames} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
     fi
 
@@ -606,7 +606,7 @@ _repHarvester(){
   ##########IP############
   printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\hline  \textbf{Ips} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
   aux=1
@@ -616,7 +616,7 @@ _repHarvester(){
     if [ "$aux" -eq "0" ]; then
       printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\hline  \textbf{Ips} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
     fi
 
@@ -642,7 +642,7 @@ _repHarvester(){
   ##########EMAIL############
   printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
   printf '%s' '\hline  \textbf{Email} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
   aux=1
@@ -652,7 +652,7 @@ _repHarvester(){
     if [ "$aux" -eq "0" ]; then
       printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
       printf '%s' '\hline  \textbf{Email} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
     fi
 
