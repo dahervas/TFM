@@ -165,7 +165,9 @@ END_SQL
 
         if [ $flag -eq 0 ]; then
           linea=$(echo $line | sed 's/^..//')
-          
+          linea=$(echo $linea | sed -nr 's/.*\[(.*)\].*/\1/p')
+          linea=$(echo "https://vulners.com/cve/"$linea)
+
           sqlite3 /home/david/TFM/BDD.db <<END_SQL
             INSERT INTO T_NMAP(PUERTO,INFO) VALUES ('$puerto','$linea');
 END_SQL
@@ -382,6 +384,8 @@ END_SQL
 
       if [ $flag -eq 0 ]; then
         linea=$(echo $line | sed 's/^..//')
+        linea=$(echo $linea | sed -nr 's/.*\[(.*)\].*/\1/p')
+        linea=$(echo "https://vulners.com/cve/"$linea)
         
         sqlite3 /home/david/TFM/BDD.db <<END_SQL
           INSERT INTO T_NMAP(PUERTO,INFO) VALUES ('$puerto','$linea');
@@ -400,6 +404,8 @@ _report(){
 
   _repMetagoofil
   _repHarvester
+
+  _repNMAP
 
   pandoc /home/david/TFM/Reporte/Reporte.md -o /home/david/TFM/Reporte/Reporte.pdf
 }
@@ -459,6 +465,10 @@ echo "---" > /home/david/TFM/Reporte/Reporte.md
 echo "title: Informe sobre el dominio "$domain >> /home/david/TFM/Reporte/Reporte.md
 echo "author: David Hervás Rodríguez" >> /home/david/TFM/Reporte/Reporte.md
 echo "date: "$fechaRep >> /home/david/TFM/Reporte/Reporte.md
+echo "header-includes:" >> /home/david/TFM/Reporte/Reporte.md
+echo "  - \usepackage{multirow, xltabular}" >> /home/david/TFM/Reporte/Reporte.md
+echo "output:" >> /home/david/TFM/Reporte/Reporte.md
+echo "    pdf_document" >> /home/david/TFM/Reporte/Reporte.md
 echo "---" >> /home/david/TFM/Reporte/Reporte.md
 echo "![](/home/david/TFM/temp/LogoUNED.jpg)" >> /home/david/TFM/Reporte/Reporte.md
 printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
@@ -531,148 +541,207 @@ _repHarvester(){
   sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='IP' LIMIT 38;" > /home/david/TFM/Reporte/theHarvIp.txt
   sqlite3 /home/david/TFM/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='EMAIL' LIMIT 38;" > /home/david/TFM/Reporte/theHarvEmail.txt
 
+  nblignesHost=$(wc -l < /home/david/TFM/Reporte/theHarvHost.txt)
+  nblignesHostname=$(wc -l < /home/david/TFM/Reporte/theHarvHostname.txt)
+  nblignesIp=$(wc -l < /home/david/TFM/Reporte/theHarvIp.txt)
+  nblignesEmail=$(wc -l < /home/david/TFM/Reporte/theHarvEmail.txt)
 
   ##########HOST############
-  printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{Hosts} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+  if [ ! "$nblignesHost" -eq "0" ]; then
+    printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+    #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\hline  \textbf{Hosts} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
-  aux=1
-  while IFS= read -r line
-  do
+    aux=1
+    while IFS= read -r line
+    do
 
-    if [ "$aux" -eq "0" ]; then
-      printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{Hosts} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
-    fi
+      if [ "$aux" -eq "0" ]; then
+        printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+        #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\hline  \textbf{Hosts} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+      fi
 
-    #printf '%s' '\url{'$line'} \\ \\' >> /home/david/TFM/Reporte/Reporte.md
-    printf '%s' $line ' \\'>> /home/david/TFM/Reporte/Reporte.md
-    aux=$((aux+1))
+      #printf '%s' '\url{'$line'} \\ \\' >> /home/david/TFM/Reporte/Reporte.md
+      printf '%s' $line ' \\'>> /home/david/TFM/Reporte/Reporte.md
+      aux=$((aux+1))
 
-    if [ "$aux" -eq "40" ]; then
-      printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
-      aux=0
-    fi
-  done </home/david/TFM/Reporte/theHarvHost.txt
+      if [ "$aux" -eq "40" ]; then
+        printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+        aux=0
+      fi
+    done </home/david/TFM/Reporte/theHarvHost.txt
 
-  printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+  fi
 
 
   ##########HOSTNAMES############
-  printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{Hostnames} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+  if [ ! "$nblignesHostname" -eq "0" ]; then
+    printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+    #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\hline  \textbf{Hostnames} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
-  aux=1
-  while IFS= read -r line
-  do
+    aux=1
+    while IFS= read -r line
+    do
 
-    if [ "$aux" -eq "0" ]; then
-      printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{Hostnames} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
-    fi
+      if [ "$aux" -eq "0" ]; then
+        printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+        #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\hline  \textbf{Hostnames} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+      fi
 
-    printf '%s' '\url{'$line'} \\' >> /home/david/TFM/Reporte/Reporte.md
-    aux=$((aux+1))
+      printf '%s' '\url{'$line'} \\' >> /home/david/TFM/Reporte/Reporte.md
+      aux=$((aux+1))
 
-    if [ "$aux" -eq "40" ]; then
-      printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
-      aux=0
-    fi
-  done </home/david/TFM/Reporte/theHarvHostname.txt
+      if [ "$aux" -eq "40" ]; then
+        printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+        aux=0
+      fi
+    done </home/david/TFM/Reporte/theHarvHostname.txt
 
-  printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md  
-
+    printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md  
+  fi
   
   ##########IP############
-  printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{Ips} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+  if [ ! "$nblignesIp" -eq "0" ]; then
+    printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+    #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\hline  \textbf{Ips} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
-  aux=1
-  while IFS= read -r line
-  do
+    aux=1
+    while IFS= read -r line
+    do
 
-    if [ "$aux" -eq "0" ]; then
-      printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{Ips} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
-    fi
+      if [ "$aux" -eq "0" ]; then
+        printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+        #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\hline  \textbf{Ips} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+      fi
 
-    #printf '%s' '\url{'$line'} \\ \\' >> /home/david/TFM/Reporte/Reporte.md
-    printf '%s' $line ' \\'>> /home/david/TFM/Reporte/Reporte.md
-    aux=$((aux+1))
+      #printf '%s' '\url{'$line'} \\ \\' >> /home/david/TFM/Reporte/Reporte.md
+      printf '%s' $line ' \\'>> /home/david/TFM/Reporte/Reporte.md
+      aux=$((aux+1))
 
-    if [ "$aux" -eq "40" ]; then
-      printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
-      aux=0
-    fi
-  done </home/david/TFM/Reporte/theHarvIp.txt
+      if [ "$aux" -eq "40" ]; then
+        printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+        aux=0
+      fi
+    done </home/david/TFM/Reporte/theHarvIp.txt
 
-  printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
-
+    printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+  fi
 
   ##########EMAIL############
-  printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-  #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\hline  \textbf{Email} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+  if [ ! "$nblignesEmail" -eq "0" ]; then
+    printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+    #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\hline  \textbf{Email} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
 
-  aux=1
-  while IFS= read -r line
-  do
+    aux=1
+    while IFS= read -r line
+    do
 
-    if [ "$aux" -eq "0" ]; then
-      printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
-      #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\hline  \textbf{Email} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
-    fi
+      if [ "$aux" -eq "0" ]; then
+        printf '%s' '\begin{table}[!hbt]' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\begin{tabular}{|p{13cm}|}' >> /home/david/TFM/Reporte/Reporte.md
+        #printf '%s' '\hline  \textbf{theHarvester} \\' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\hline  \textbf{Email} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+      fi
 
-    #printf '%s' '\url{'$line'} \\ \\' >> /home/david/TFM/Reporte/Reporte.md
-    printf '%s' $line ' \\'>> /home/david/TFM/Reporte/Reporte.md
-    aux=$((aux+1))
+      #printf '%s' '\url{'$line'} \\ \\' >> /home/david/TFM/Reporte/Reporte.md
+      printf '%s' $line ' \\'>> /home/david/TFM/Reporte/Reporte.md
+      aux=$((aux+1))
 
-    if [ "$aux" -eq "40" ]; then
-      printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-      printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
-      aux=0
-    fi
-  done </home/david/TFM/Reporte/theHarvEmail.txt
+      if [ "$aux" -eq "40" ]; then
+        printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+        printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+        aux=0
+      fi
+    done </home/david/TFM/Reporte/theHarvEmail.txt
 
-  printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
-  printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\hline \end{tabular}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\end{table}' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\vfill' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+  fi
+}
+
+_repNMAP(){
+
+  sqlite3 /home/david/TFM/BDD.db "select * from T_NMAP LIMIT 60;" > /home/david/TFM/Reporte/nmap.txt
+  nblignesNMAP=$(wc -l < /home/david/TFM/Reporte/nmap.txt)
+
+  if [ ! "$nblignesNMAP" -eq "0" ]; then
+    echo "\n\n# Etapa 2: Descubrimiento - NMAP" >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\begin{xltabular}{\textwidth}{|l|X|}' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Puerto}} & \multicolumn{1}{c|}{\textbf{Información}} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\endfirsthead' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Puerto}} & \multicolumn{1}{c|}{\textbf{Información}} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md 
+    printf '%s' '\endhead' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline \multicolumn{2}{|r|}{{Continua en la siguiente página}} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\endfoot' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\endlastfoot' >> /home/david/TFM/Reporte/Reporte.md
+
+    puerto=0
+    hlinea=0
+    while IFS='|' read -r param1 param2
+    do
+
+      aux=$(echo $param1"|")
+      aux=$(grep -o $aux /home/david/TFM/Reporte/nmap.txt | wc -l)
+
+      if [ ! "$puerto" -eq "$param1" ]; then
+        if [ "$hlinea" -eq "1" ]; then
+          printf '%s' '\hline' >> /home/david/TFM/Reporte/Reporte.md 
+        fi
+        hlinea=1
+        printf '%s' '\multirow{'$aux'}{4em}{'$param1'} & '$param2' \\' >> /home/david/TFM/Reporte/Reporte.md 
+      else
+        printf '%s' '& '$param2' \\' >> /home/david/TFM/Reporte/Reporte.md
+      fi
+
+      puerto=$param1
+    done </home/david/TFM/Reporte/nmap.txt
+
+    printf '%s' '\end{xltabular}' >> /home/david/TFM/Reporte/Reporte.md
+
+  fi
+
 }
 
 _initBDD()
