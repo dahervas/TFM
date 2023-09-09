@@ -467,7 +467,7 @@ _report(){
   _repMetasploit
 
   _repAutorizacion
-  #_repConfidencialidad
+  _repConfidencialidad
 
   pandoc /home/david/TFM/Reporte/Reporte.md -o /home/david/TFM/Reporte/Reporte.pdf
 }
@@ -831,9 +831,172 @@ _repMetasploit(){
 
 }
 
-_repAutorizacion(){}
+_repAutorizacion(){
+  dia=$(date "+%d")
+  mes=$(date "+%m")
+  anyo=$(date "+%Y")
 
-_repConfidencialidad(){}
+  case $mes in
+    01)
+      mes="Enero"
+      ;;
+    02)
+      mes="Febrero"
+      ;;
+    03)
+      mes="Marzo"
+      ;;
+    04)
+      mes="Abril"
+      ;;
+    05)
+      mes="Mayo"
+      ;;
+    06)
+      mes="Junio"
+      ;;
+    07)
+      mes="Julio"
+      ;;
+    08)
+      mes="Agosto"
+      ;;
+    09)
+      mes="Septiembre"
+      ;;
+    10)
+      mes="Octubre"
+      ;;
+    11)
+      mes="Noviembre"
+      ;;
+    12)
+      mes="Diciembre"
+      ;;
+  esac
+
+  fechaRep=$(echo $dia" de "$mes" de "$anyo)
+
+  echo "\n\n# Autorización" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "Cliente: [Nombre de la Empresa u Organización]  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Nombre: [Nombre de la persona solicitante del informe]  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Puesto: [Puesto de la persona solicitante del informe]  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Fecha:" $fechaRep "  ">> /home/david/TFM/Reporte/Reporte.md
+  echo "Asunto: Evaluación de vulnerabilidades y Autorización del proceso de Pentesting  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "## Descripción de las Pruebas" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "Las pruebas de penetración involucrarán un análisis exhaustivo de nuestra infraestructura de tecnología de la información, incluyendo sistemas, aplicaciones, redes y dispositivos relacionados. El objetivo es identificar debilidades en la seguridad y evaluar la resistencia de nuestros sistemas ante posibles amenazas cibernéticas." >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "## Equipo Responsable" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "Las pruebas de penetración serán realizadas por un equipo de expertos en seguridad cibernética debidamente autorizados y certificados. Este equipo estará liderado por [Nombre del Líder del Equipo], quien cuenta con una amplia experiencia en pruebas de penetración y está comprometido con el cumplimiento de altos estándares éticos y legales." >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "## Compromiso de No Causar Daños" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "Entiendo que las pruebas de penetración pueden causar interrupciones temporales en nuestros sistemas y redes. Sin embargo, se espera que el equipo de pruebas minimice cualquier impacto negativo y notifique de inmediato cualquier incidente o daño accidental que pueda ocurrir durante el proceso." >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  printf '%s' '\vfill  ' >> /home/david/TFM/Reporte/Reporte.md 
+  echo "Firma: ___________________________ Firma:___________________________  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "[Nombre de la persona que autoriza][Nombre del Líder del Equipo Responsable]  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "[Título de la persona que autoriza][Título del Líder del Equipo Responsable]  " >> /home/david/TFM/Reporte/Reporte.md
+  printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+}
+
+_repConfidencialidad(){
+  dia=$(date "+%d")
+  mes=$(date "+%m")
+  anyo=$(date "+%Y")
+
+  case $mes in
+    01)
+      mes="Enero"
+      ;;
+    02)
+      mes="Febrero"
+      ;;
+    03)
+      mes="Marzo"
+      ;;
+    04)
+      mes="Abril"
+      ;;
+    05)
+      mes="Mayo"
+      ;;
+    06)
+      mes="Junio"
+      ;;
+    07)
+      mes="Julio"
+      ;;
+    08)
+      mes="Agosto"
+      ;;
+    09)
+      mes="Septiembre"
+      ;;
+    10)
+      mes="Octubre"
+      ;;
+    11)
+      mes="Noviembre"
+      ;;
+    12)
+      mes="Diciembre"
+      ;;
+  esac
+
+  fechaRep=$(echo $dia" de "$mes" de "$anyo)
+
+  echo "\n\n# Manifiesto de Confidencialidad para Pruebas de Penetración  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "En [Nombre de la Empresa u Organización], reconocemos la importancia crítica de la seguridad de nuestros sistemas y redes de información. Para garantizar la integridad y confidencialidad de nuestros activos digitales, hemos decidido llevar a cabo pruebas de penetración. Este manifiesto de confidencialidad establece los principios y compromisos que guiarán todas las actividades relacionadas con estas pruebas.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  echo "## 1. Propósito y Alcance  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Las pruebas de penetración se llevarán a cabo con el único propósito de evaluar y mejorar la seguridad de nuestros sistemas y redes de información. Estas pruebas se realizarán dentro del alcance definido y autorizado previamente.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  
+  echo "## 2. Confidencialidad Absoluta  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Todas las actividades y resultados de las pruebas de penetración se considerarán información altamente confidencial. Esto incluye cualquier dato, hallazgo, documento, informe o acceso a sistemas que se obtenga durante el proceso de pruebas.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+
+  echo "## 3. Acceso Autorizado  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "El equipo de pruebas de penetración, debidamente autorizado, será el único responsable de llevar a cabo las pruebas. Se compromete a no divulgar, compartir ni utilizar de manera indebida ninguna información o acceso obtenido durante las pruebas.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+
+  echo "## 4. Protección de Datos Sensibles  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "En el caso de que se identifiquen datos sensibles o información crítica durante las pruebas, el equipo de pruebas se compromete a informar de inmediato a [Nombre del Responsable de Seguridad o Equipo de Respuesta a Incidentes] para que se tomen medidas adecuadas para su protección y mitigación de riesgos.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+
+  echo "## 5. Cumplimiento Legal y Ético  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Todas las actividades de pruebas de penetración se llevarán a cabo de acuerdo con las leyes y regulaciones locales, nacionales e internacionales aplicables. Además, se seguirán las mejores prácticas éticas y profesionales en todo momento.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+
+  echo "## 6. Retención de Información  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Una vez finalizadas las pruebas de penetración, se retendrán todos los datos y resultados durante el período especificado en el acuerdo de pruebas. Pasado ese tiempo, se eliminará toda la información obtenida durante las pruebas de manera segura y de acuerdo con las políticas de retención de datos de la empresa.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+
+  echo "## 7. Responsabilidad y Supervisión  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "El [Nombre del Responsable de Seguridad o Equipo de Respuesta a Incidentes] supervisará y garantizará el cumplimiento de este manifiesto de confidencialidad en todas las etapas de las pruebas de penetración.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+  
+  echo "## 8. Compromiso de Cumplimiento  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "Al firmar este manifiesto de confidencialidad, todos los miembros del equipo de pruebas de penetración se comprometen a cumplir con estos principios y compromisos en todo momento. Cualquier violación de este manifiesto se considerará una infracción grave y será tratada de acuerdo con las políticas y regulaciones de la empresa.  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "\n" >> /home/david/TFM/Reporte/Reporte.md
+
+  echo "Fecha y Firma: "$fechaRep"  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "[Firma del Miembro del Equipo de Pruebas de Penetración]  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "[Nombre del Miembro del Equipo de Pruebas de Penetración]  " >> /home/david/TFM/Reporte/Reporte.md
+  echo "[Nombre de la Empresa u Organización]  " >> /home/david/TFM/Reporte/Reporte.md
+  #echo "Este manifiesto de confidencialidad es un documento fundamental para garantizar la protección de la información y la integridad de las pruebas de penetración. Todos los involucrados deben leer, comprender y cumplir con estos principios antes de iniciar cualquier actividad relacionada con pruebas de penetración.  " >> /home/david/TFM/Reporte/Reporte.md
+}
 
 _initBDD()
 {
