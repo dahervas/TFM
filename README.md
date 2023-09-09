@@ -106,11 +106,11 @@ METAS ALCANZADAS:
 
 -La sexta opción es funcional (Generación reporte).
 
+-Añadidos acuerdos de autorización y confidencialidad al Informe final
+
 =============================================
 
 METAS PRÓXIMAS:
-
--Añadir acuerdos de autorización y confidencialidad al Informe final
 
 -Embellecer el menú.
 
