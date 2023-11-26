@@ -108,6 +108,8 @@ METAS ALCANZADAS:
 
 -Añadidos acuerdos de autorización y confidencialidad al Informe final
 
+-El script es ejecutable desde un entorno diferente, se han variabilizado los repertorios y las rutas del script.
+
 =============================================
 
 METAS PRÓXIMAS:
@@ -117,8 +119,6 @@ METAS PRÓXIMAS:
 -Limpiar el código del menú.
 
 -Dar más capacidad de personalización para la ejecución de theHarvester, permitiendo al usuario introducir manualmente (si quiere) introducir los valores del parámetro -b (fuentes)
-
--Para permitir que el script sea ejecutable desde un entorno diferente, se pueden variabilizar las rutas donde se guardan los ficheros de ejecuciones y logs.
 
 -Se está investigando la manera de añadir una barra de progreso para evitar que el usuario espere a la ejecución de las herramientas con una ventana inmóvil.
 
