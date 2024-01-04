@@ -489,6 +489,8 @@ _report(){
   _repConfidencialidad
 
   pandoc $dir/Reporte/Reporte.md -o $dir/Reporte/Reporte.pdf
+
+  echo "Reporte generado en el repertorio $dir/Reporte"
 }
 
 _repPortada(){
@@ -579,7 +581,7 @@ printf '%s' '\newpage' >> $dir/Reporte/Reporte.md
 
 _repMetagoofil(){
 
-  sqlite3 $dir/BDD.db "SELECT * FROM T_METAGOOF;" > $dir/Reporte/metagoofil.txt
+  sqlite3 $dir/BDD.db "SELECT * FROM T_METAGOOF where DOCUMENTO like '%ing.es%';" > $dir/Reporte/metagoofil.txt
   nblignesMETA=$(wc -l < $dir/Reporte/metagoofil.txt)
 
   if [ ! "$nblignesMETA" -eq "0" ]; then
@@ -974,6 +976,7 @@ _repConfidencialidad(){
   echo "[Firma del Miembro del Equipo de Pruebas de Penetración]  " >> $dir/Reporte/Reporte.md
   echo "[Nombre del Miembro del Equipo de Pruebas de Penetración]  " >> $dir/Reporte/Reporte.md
   echo "[Nombre de la Empresa u Organización]  " >> $dir/Reporte/Reporte.md
+
   #echo "Este manifiesto de confidencialidad es un documento fundamental para garantizar la protección de la información y la integridad de las pruebas de penetración. Todos los involucrados deben leer, comprender y cumplir con estos principios antes de iniciar cualquier actividad relacionada con pruebas de penetración.  " >> $dir/Reporte/Reporte.md
 }
 
