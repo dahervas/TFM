@@ -56,7 +56,8 @@ _menu()
     echo "4) Opcion 4: Ejecución nmap"
     echo "5) Opcion 5: Ejecución metasploit"
     echo "6) Opcion 6: Generación reporte"
-    echo "98) Opcion 98: Inicializar BDD"
+    echo "97) Opcion 97: Inicializar BDD"
+    echo "98) Opcion 98: Limpiar BDD"
     echo "99) Opcion 99: Debug"
     echo
     echo "9) Salir"
@@ -131,10 +132,16 @@ _mostrarResultado()
         _report $dom & bash spinner.sh $!
     fi
 
-    if [ "$1" -eq "98" ]; then
+    if [ "$1" -eq "97" ]; then
       echo "Inicialización de la base de datos"
       echo "------------------------------------"
       _initBDD & bash spinner.sh $!
+    fi   
+
+    if [ "$1" -eq "98" ]; then
+      echo "Limpia de la base de datos"
+      echo "------------------------------------"
+      _truncBDD & bash spinner.sh $!
     fi   
 
     if [ "$1" -eq "99" ]; then
@@ -572,7 +579,7 @@ printf '%s' '\newpage' >> $dir/Reporte/Reporte.md
 
 _repMetagoofil(){
 
-  sqlite3 $dir/BDD.db "SELECT * FROM T_METAGOOF;" > $dir/Reporte/metagoofil.txt
+  sqlite3 $dir/BDD.db "SELECT * FROM T_METAGOOF where DOCUMENTO like '%ing.es%';" > $dir/Reporte/metagoofil.txt
   nblignesMETA=$(wc -l < $dir/Reporte/metagoofil.txt)
 
   if [ ! "$nblignesMETA" -eq "0" ]; then
@@ -977,6 +984,12 @@ _initBDD()
 
  sqlite3 $dir/BDD.db 'CREATE TABLE IF NOT EXISTS T_NMAP(PUERTO INT,INFO TEXT);' 2>/dev/null
 }
+
+_truncBDD(){
+  sqlite3 $dir/BDD.db 'DELETE FROM T_METAGOOF;' 2>/dev/null
+  sqlite3 $dir/BDD.db 'DELETE FROM T_THEHARVEST;' 2>/dev/null
+  sqlite3 $dir/BDD.db 'DELETE FROM T_NMAP;' 2>/dev/null
+}
  
 # opcion por defecto
 opc="0"
@@ -1007,6 +1020,10 @@ do
             _menu
             ;;
         6)
+            _mostrarResultado $opc
+            _menu
+            ;;
+        97)
             _mostrarResultado $opc
             _menu
             ;;
