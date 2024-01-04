@@ -579,7 +579,7 @@ printf '%s' '\newpage' >> $dir/Reporte/Reporte.md
 
 _repMetagoofil(){
 
-  sqlite3 $dir/BDD.db "SELECT * FROM T_METAGOOF where DOCUMENTO like '%ing.es%';" > $dir/Reporte/metagoofil.txt
+  sqlite3 $dir/BDD.db "SELECT * FROM T_METAGOOF;" > $dir/Reporte/metagoofil.txt
   nblignesMETA=$(wc -l < $dir/Reporte/metagoofil.txt)
 
   if [ ! "$nblignesMETA" -eq "0" ]; then
