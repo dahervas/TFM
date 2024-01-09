@@ -364,20 +364,26 @@ _nmap(){
     rm $dir/temp/nmap_output.txt
   fi
 
-  nmap -sV --script=vulscan/vulscan.nse --script-args vulscandb=cve.csv $domain > $dir/temp/nmapLog.txt
+  nmap -sV --script=vulscan/vulscan.nse --script-args vulscandb=cve.csv $domain > $dir/temp/nmapLog.txt 2>/dev/null
 
   if [ $? -ne 0 ]; then
     echo "Error en la ejecución de nmap"
   else
-
-
-    sed "$(( $(wc -l <$dir/temp/nmapLog.txt)-3 )),$ d" $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt 
-    sed -e '1,6d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
-    sed '/^|_/d' $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt
-    sed '/^| vulscan/d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
-    sed -r '/^.{,3}$/d' $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt
-    sed '/closed/d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
-
+    if grep -q "| " $dir/temp/nmapLog.txt; then
+      sed "$(( $(wc -l <$dir/temp/nmapLog.txt)-3 )),$ d" $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt 
+      sed -e '1,6d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
+      sed '/^|_/d' $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt
+      sed '/^| vulscan/d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
+      sed -r '/^.{,3}$/d' $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt
+      sed '/closed/d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
+    else
+      sed "$(( $(wc -l <$dir/temp/nmapLog.txt)-3 )),$ d" $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt 
+      sed -e '1,7d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
+      sed '/^|_/d' $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt
+      sed '/^| vulscan/d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
+      sed -r '/^.{,3}$/d' $dir/temp/nmapLog.txt > $dir/temp/nmapMod.txt
+      sed '/closed/d' $dir/temp/nmapMod.txt > $dir/temp/nmapLog.txt
+    fi
 
     sqlite3 $dir/BDD.db 'DELETE FROM T_NMAP;'
     while read line; do
@@ -581,7 +587,6 @@ printf '%s' '\newpage' >> $dir/Reporte/Reporte.md
 
 _repMetagoofil(){
 
-  sqlite3 $dir/BDD.db "SELECT * FROM T_METAGOOF where DOCUMENTO like '%ing.es%';" > $dir/Reporte/metagoofil.txt
   nblignesMETA=$(wc -l < $dir/Reporte/metagoofil.txt)
 
   if [ ! "$nblignesMETA" -eq "0" ]; then
@@ -623,118 +628,127 @@ _repMetagoofil(){
 
 _repHarvester(){
 
-  echo "\n\n# Etapa 1: Reconocimiento - theHarvester" >> $dir/Reporte/Reporte.md
-  sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOST' LIMIT 100;" > $dir/Reporte/theHarvHost.txt
-  #sed -e 's!HOST|!!' $dir/Reporte/theHarvHost.txt > $dir/Reporte/theHarvHost2.txt && 
-  sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOSTNAME' LIMIT 100;" > $dir/Reporte/theHarvHostname.txt
-  sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='IP' LIMIT 100;" > $dir/Reporte/theHarvIp.txt
-  sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='EMAIL' LIMIT 100;" > $dir/Reporte/theHarvEmail.txt
+  nbTHEHARV1=$(wc -l < $dir/temp/hosts.txt)
+  nbTHEHARV2=$(wc -l < $dir/temp/hostname.txt)
+  nbTHEHARV3=$(wc -l < $dir/temp/ip.txt)
+  nbTHEHARV4=$(wc -l < $dir/temp/email.txt)
 
-  nblignesHost=$(wc -l < $dir/Reporte/theHarvHost.txt)
-  nblignesHostname=$(wc -l < $dir/Reporte/theHarvHostname.txt)
-  nblignesIp=$(wc -l < $dir/Reporte/theHarvIp.txt)
-  nblignesEmail=$(wc -l < $dir/Reporte/theHarvEmail.txt)
 
-  ##########HOST############
-  if [ ! "$nblignesHost" -eq "0" ]; then
-    printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
+  if [ ! "$nbTHEHARV1" -eq "0" ] || [ ! "$nbTHEHARV2" -eq "0" ] || [ ! "$nbTHEHARV3" -eq "0" ] || [ ! "$nbTHEHARV4" -eq "0" ]; then
+    echo "\n\n# Etapa 1: Reconocimiento - theHarvester" >> $dir/Reporte/Reporte.md
+    sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOST';" > $dir/Reporte/theHarvHost.txt
+    #sed -e 's!HOST|!!' $dir/Reporte/theHarvHost.txt > $dir/Reporte/theHarvHost2.txt && 
+    sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='HOSTNAME';" > $dir/Reporte/theHarvHostname.txt
+    sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='IP';" > $dir/Reporte/theHarvIp.txt
+    sqlite3 $dir/BDD.db "select DOCUMENTO from T_THEHARVEST WHERE TIPO='EMAIL';" > $dir/Reporte/theHarvEmail.txt
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hosts}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
+    nblignesHost=$(wc -l < $dir/Reporte/theHarvHost.txt)
+    nblignesHostname=$(wc -l < $dir/Reporte/theHarvHostname.txt)
+    nblignesIp=$(wc -l < $dir/Reporte/theHarvIp.txt)
+    nblignesEmail=$(wc -l < $dir/Reporte/theHarvEmail.txt)
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hosts}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
+    ##########HOST############
+    if [ ! "$nblignesHost" -eq "0" ]; then
+      printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hosts}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
 
-    while IFS= read -r line
-    do
-      linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
-      printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
-    done <$dir/Reporte/theHarvHost.txt
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hosts}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
 
-  fi
-  
-  ##########HOSTNAMES############
-  if [ ! "$nblignesHostname" -eq "0" ]; then
-    printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hostnames}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
+      while IFS= read -r line
+      do
+        linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
+        printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
+      done <$dir/Reporte/theHarvHost.txt
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hostnames}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
+      printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
+    fi
+    
+    ##########HOSTNAMES############
+    if [ ! "$nblignesHostname" -eq "0" ]; then
+      printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hostnames}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
 
-    while IFS= read -r line
-    do
-      linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
-      printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
-    done <$dir/Reporte/theHarvHostname.txt
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Hostnames}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
 
-  fi
-  
-  ##########IP############
-  if [ ! "$nblignesIp" -eq "0" ]; then
-    printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{IPs}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
+      while IFS= read -r line
+      do
+        linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
+        printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
+      done <$dir/Reporte/theHarvHostname.txt
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{IPs}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
+      printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
+    fi
+    
+    ##########IP############
+    if [ ! "$nblignesIp" -eq "0" ]; then
+      printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{IPs}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
 
-    while IFS= read -r line
-    do
-      linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
-      printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
-    done <$dir/Reporte/theHarvIp.txt
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{IPs}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
-  fi
+      printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
 
-  ##########EMAIL############
-  if [ ! "$nblignesEmail" -eq "0" ]; then
-    printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Email}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
+      while IFS= read -r line
+      do
+        linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
+        printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
+      done <$dir/Reporte/theHarvIp.txt
 
-    printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Email}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
+      printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
+    fi
 
-    printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
+    ##########EMAIL############
+    if [ ! "$nblignesEmail" -eq "0" ]; then
+      printf '%s' '\begin{xltabular}{\textwidth}{|X|}' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\hline' >> $dir/Reporte/Reporte.md
-    printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Email}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfirsthead' >> $dir/Reporte/Reporte.md
 
-    while IFS= read -r line
-    do
-      linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
-      printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
-    done <$dir/Reporte/theHarvEmail.txt
+      printf '%s' '\hline \multicolumn{1}{|c|}{\textbf{Email}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endhead' >> $dir/Reporte/Reporte.md
 
-    printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
+      printf '%s' '\hline \multicolumn{1}{|r|}{{Continua en la siguiente página}} \\ \hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endfoot' >> $dir/Reporte/Reporte.md
+
+      printf '%s' '\hline' >> $dir/Reporte/Reporte.md
+      printf '%s' '\endlastfoot' >> $dir/Reporte/Reporte.md
+
+      while IFS= read -r line
+      do
+        linea=$(echo "$line" | sed -r 's/[_]+/\\_/g')
+        printf '%s' '\url{'$linea'} \\' >> $dir/Reporte/Reporte.md
+      done <$dir/Reporte/theHarvEmail.txt
+
+      printf '%s' '\end{xltabular}' >> $dir/Reporte/Reporte.md
+    fi
   fi
     printf '%s' '\newpage' >> $dir/Reporte/Reporte.md
 }
