@@ -2,6 +2,9 @@
 Master's degree final project
 
 =============================================
+INSTALACIÓN Y DESPLIEGUE EN CURSO
+.........
+=============================================
 # VERSION 0.0.1
 
 METAS ALCANZADAS:
