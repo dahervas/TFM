@@ -13,14 +13,19 @@ Master's degree final project
 1.  Se debe instalar LaTeX mediante los comandos siguientes:
    
   ●	sudo apt-get install texlive
+  
   ●	sudo apt-get -y install texlive-base texlive-latex-extra texlive-fonts-extra
+  
 3.  Se debe instalar xmllint mediante el comando:
 
   ●	apt-get install libxml2-utils
+  
 4.  Se debe instalar vulscan mediantes los comandos:
 
   ●	git clone https://github.com/scipag/vulscan scipag_vulscan
+  
   ●	ln -s ``pwd``/scipag_vulscan /usr/share/nmap/scripts/vulscan
+  
 5.  Por último se deben descargar los ficheros menu.sh, spinner.sh y BDD.db del GitHub del proyecto (https://github.com/dahervas/TFM).
 Una vez descargados, solo hay que depositarlos en un mismo repertorio y proceder con la ejecución del script menu.sh
 
