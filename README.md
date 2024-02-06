@@ -2,8 +2,15 @@
 Master's degree final project
 
 =============================================
-INSTALACIÓN Y DESPLIEGUE EN CURSO
-.........
+## AUTOPENTEST
+
+# Requisitos previos
+1.	Descargar Kali Linux. Desde el sitio web oficial se puede descargar la imagen ISO más reciente de Kali Linux: https://www.kali.org/get-kali/#kali-virtual-machines. Se debe escoger la opción adecuada a nuestro sistema y su arquitectura de las que se presentan.
+2.  Instalar VirtualBox. De nuevo, desde el sitio oficial de VirtualBox se debe descargar e instalar la última versión o la que se considere más adecuada al sistema empleado.
+3.  Se debe crear una máquina virtual con la imagen ISO Kali y configurarla (incluyendo el gestor de arranque GRUB).
+
+# Despliegue de AutoPenTest
+
 =============================================
 # VERSION 0.0.1
 
